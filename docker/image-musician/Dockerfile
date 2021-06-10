@@ -4,5 +4,6 @@ RUN apt-get update && \
    apt-get install -y nano
 
 COPY src /opt/app/
+WORKDIR /opt/app
 
-CMD ["node", "/opt/app/musician.js"]
+ENTRYPOINT ["node", "/opt/app/thermometer.js"]
