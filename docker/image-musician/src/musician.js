@@ -35,7 +35,6 @@ function Musician(instrument, uuid, lastActivity) {
 
 var instrument = process.argv[2];
 var id = require('uuid'); 
-const { prototype } = require('events');
 var uuid = id.v4();
 var time = Date.now(); 
 
