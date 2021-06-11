@@ -7,19 +7,17 @@ var uuidGenerator = require('uuid');
 var s = dgram.createSocket('udp4');
 
 class Musician {
-   constructor(instrument, uuid, dateOfActivity) {
+   constructor(instrument, uuid) {
 
       this.instrument = instrument;
       this.uuid = uuid;
-      this.dateOfActivity = dateOfActivity;
 
       Musician.prototype.update = function () {
-         var measure = {
+         var output = {
             uuid: this.uuid,
-            sound: protocol[instrument],
-            activeSince: this.dateOfActivity
+            sound: protocol[instrument]
          };
-         var payload = JSON.stringify(measure);
+         var payload = JSON.stringify(output);
 
          var message = Buffer.from(payload);
          s.send(message, 0, message.length, protocol.PROTOCOL_PORT, protocol.PROTOCOL_MULTICAST_ADDRESS, function (err, bytes) {
@@ -35,6 +33,5 @@ class Musician {
 
 var instrument = process.argv[2];
 var uuid = uuidGenerator.v4();
-var date = Date.now();
 
-var m1 = new Musician(instrument, uuid, date);
+var m1 = new Musician(instrument, uuid);
