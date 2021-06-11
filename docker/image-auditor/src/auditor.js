@@ -12,22 +12,18 @@ var app = express();
 
 //get instrument from sound
 function getInstrumentFromSound(sound) {
-   if (sound == protocol.piano) {
+   if (sound == protocol.piano.value) {
       return "piano";
-   }
-   switch (sound) {
-      case protocol.piano:
-         return "piano";
-      case protocol.drum:
-         return "drum";
-      case protocol.flute:
-         return "flute";
-      case protocol.trumpet:
-         return "trumpet";
-      case protocol.violin:
-         return "violin";
-      default:
-         return null;
+   } else if (sound == protocol.drum.value) {
+      return "drum";
+   } else if (sound == protocol.flute.value) {
+      return "flute";
+   } else if (sound == protocol.trumpet.value) {
+      return "trumpet";
+   } else if (sound == protocol.violin.value) {
+      return "violin";
+   } else {
+      return null;
    }
 }
 
@@ -69,7 +65,7 @@ s.on('message', function (msg, source) {
 
 //tcp
 app.get('/', function (req, res) {
-   res.send(getMusicians());
+   res.send(JSON.stringify(getMusicians()));
 });
 
 app.listen(2205, function () {
