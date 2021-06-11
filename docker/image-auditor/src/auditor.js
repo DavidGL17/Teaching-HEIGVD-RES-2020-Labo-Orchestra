@@ -12,6 +12,9 @@ var app = express();
 
 //get instrument from sound
 function getInstrumentFromSound(sound) {
+   if (sound == protocol.piano) {
+      return "piano";
+   }
    switch (sound) {
       case protocol.piano:
          return "piano";
@@ -48,7 +51,7 @@ function udpHandler(msg, source) {
 //function to get all musicians in map
 function getMusicians() {
    var list = [];
-   list.forEach((value, key, map) => {
+   musicians.forEach(function (value, key) {
       list.push({ uuid: key, instrument: value.instrument, activeSince: value.activeSince });
    });
    return list;
@@ -69,6 +72,18 @@ app.get('/', function (req, res) {
    res.send(getMusicians());
 });
 
-app.listen(3000, function () {
+app.listen(2205, function () {
    console.log('Accepting HTTP requests on port 3000.');
 });
+
+//refresh map
+
+setInterval(function () {
+   var now = new Date();
+   musicians.forEach(function (value, key) {
+      var dif = Math.abs((now.getTime() - value.lastContact.getTime()) / 1000);
+      if (dif > 5) { //If last contact older than 5 sec
+         musicians.delete(key);
+      }
+   });
+}, 1000);
