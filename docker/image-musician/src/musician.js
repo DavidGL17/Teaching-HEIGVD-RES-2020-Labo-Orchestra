@@ -7,14 +7,12 @@ var dgram = require('dgram');
 var s = dgram.createSocket('udp4');
 
 
-function Musician(instrument, uuid, lastActivity) {
+function Musician(instrument, uuid) {
     this.instrument = instrument;
     this.uuid = uuid;
-    this.lastActivity = lastActivity;
 
     Musician.prototype.update = function() {
         var measure = {
-            time: this.lastActivity,
             uuid: this.uuid,
             sound: protocol[instrument]
         };
@@ -35,7 +33,6 @@ function Musician(instrument, uuid, lastActivity) {
 
 var instrument = process.argv[2];
 var id = require('uuid'); 
-var uuid = id.v4();
-var time = Date.now(); 
+var uuid = id.v4(); 
 
-var m1 = new Musician(instrument, uuid, time);
+var m1 = new Musician(instrument, uuid);
