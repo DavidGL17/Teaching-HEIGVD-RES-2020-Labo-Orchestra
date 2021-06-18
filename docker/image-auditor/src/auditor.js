@@ -1,9 +1,15 @@
-//Variables
+//Packages
 const protocol = require('./protocol');
-
+//tcp server
+const net = require('net');
+const server = new net.Server();
+//time managment
+const moment = require('moment');
+//udp listener
 const dgram = require('dgram');
 const s = dgram.createSocket('udp4');
 
+//active musician map and sound map
 var musicians = new Map();
 const soundToInstrument = new Map();
 soundToInstrument.set("ti-ta-ti", "piano");
@@ -12,10 +18,6 @@ soundToInstrument.set("trulu", "flute");
 soundToInstrument.set("gzi-gzi", "violin");
 soundToInstrument.set("boum-boum", "drum");
 
-const net = require('net');
-const server = new net.Server();
-
-const moment = require('moment');
 
 //function to add a musician
 function udpMessageHandler(msg, source) {
@@ -43,7 +45,7 @@ function getMusicians() {
    return list;
 }
 
-//udp
+//udp handling
 s.bind(protocol.PROTOCOL_PORT, function () {
    console.log("Joining multicast group");
    s.addMembership(protocol.PROTOCOL_MULTICAST_ADDRESS);
@@ -53,7 +55,7 @@ s.on('message', function (msg, source) {
    udpMessageHandler(msg, source);
 });
 
-//tcp
+//tcp handling
 server.listen(2205, function () {
    console.log("Server listening for TCP connection requests on port 2205");
 });
@@ -61,16 +63,13 @@ server.listen(2205, function () {
 server.on('connection', function (socket) {
    console.log('A new TCP connection has been established.');
 
-   /* generate json content for TCP client */
-   var musicianAlive = getMusicians();
-   socket.write(JSON.stringify(musicianAlive));
+   var musicianPlayingTab = getMusicians();
+   socket.write(JSON.stringify(musicianPlayingTab));
 
-   /* We destroy the socket, that close the connection for the client */
    socket.destroy();
 });
 
-//refresh map
-
+//refresh map to delete inactive musicians
 setInterval(function () {
    musicians.forEach(function (value, key, map) {
       var now = moment();
