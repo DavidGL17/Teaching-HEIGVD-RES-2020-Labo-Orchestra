@@ -157,26 +157,26 @@ When you connect to the TCP interface of the **Auditor**, you should receive an 
 
 ## Task 4: implement an "auditor" Node.js application
 
-| #        | Topic                                                                                              |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| Question | With Node.js, how can we listen for UDP datagrams in a multicast group?                            |
-|          | *Enter your response here...*                                                                      |
-| Question | How can we use the `Map` built-in object introduced in ECMAScript 6 to implement a **dictionary**? |
-|          | *Enter your response here...*                                                                      |
-| Question | How can we use the `Moment.js` npm module to help us with **date manipulations** and formatting?   |
-|          | *Enter your response here...*                                                                      |
-| Question | When and how do we **get rid of inactive players**?                                                |
-|          | *Enter your response here...*                                                                      |
-| Question | How do I implement a **simple TCP server** in Node.js?                                             |
-|          | *Enter your response here...*                                                                      |
+| #        | Topic                                                                                                                                                                                                                   |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Question | With Node.js, how can we listen for UDP datagrams in a multicast group?                                                                                                                                                 |
+|          | We wait for a 'message' event                                                                                                                                                                                           |
+| Question | How can we use the `Map` built-in object introduced in ECMAScript 6 to implement a **dictionary**?                                                                                                                      |
+|          | We add a Map that will contain all musicians that the auditor hears, and we use the uuid as the key, since it is a unique value                                                                                         |
+| Question | How can we use the `Moment.js` npm module to help us with **date manipulations** and formatting?                                                                                                                        |
+|          | using the format() function to format the date to make it more readable, and we can use functions like subtract() to modify our dates. It makes our task easier than using the Date object                              |
+| Question | When and how do we **get rid of inactive players**?                                                                                                                                                                     |
+|          | We make a function that will be executed every 500 ms, and check for each musician in our musician map when we heard it for the last time. If we haven't heard a musician for more than 5 sec we remove it from our map |
+| Question | How do I implement a **simple TCP server** in Node.js?                                                                                                                                                                  |
+|          | We use the net framework. When a client arrives, a socket is created, we send our message through that socket and close it, to ensure the data is correctly sent                                                        |
 
 
 ## Task 5: package the "auditor" app in a Docker image
 
-| #        | Topic                                                                                |
-| -------- | ------------------------------------------------------------------------------------ |
-| Question | How do we validate that the whole system works, once we have built our Docker image? |
-|          | *Enter your response here...*                                                        |
+| #        | Topic                                                                                                                                                                                                                                                                                                                                                         |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Question | How do we validate that the whole system works, once we have built our Docker image?                                                                                                                                                                                                                                                                          |
+|          | We check first that the auditor listens correctly to the musicians, and adds them to his map (by connecting to the auditor and checking the musicians that he hears). Then we make sure that if we remove a musician the auditor detects it 5 sec later and removes it from the map. We can check this by connecting to the auditor, and by checking the logs |
 
 
 ## Constraints
