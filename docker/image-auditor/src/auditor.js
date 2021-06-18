@@ -40,7 +40,7 @@ function auditory(msg, source)  {
 
 function jsonMusiciansList() {
   var list = [];
-  list.forEach(function (value, key) {
+  activeMusicians.forEach(function (value, key) {
      list.push({ uuid: key, instrument: value.instrument, activeSince: value.activeSince.utcOffset(+120).format()});
   });
   return list;
