@@ -26,7 +26,7 @@ function Musician(instrument, uuid) {
 
     }
 
-    setInterval(this.update.bind(this), 500);
+    setInterval(this.update.bind(this), 1000);
 
 }
 
