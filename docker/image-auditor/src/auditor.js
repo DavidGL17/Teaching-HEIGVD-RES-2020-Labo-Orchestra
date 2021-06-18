@@ -18,7 +18,7 @@ const server = new net.Server();
 const moment = require('moment');
 
 //function to add a musician
-function udpHandler(msg, source) {
+function udpMessageHandler(msg, source) {
    jsonData = JSON.parse(msg);
    if (soundToInstrument.has(jsonData.sound) && jsonData.uuid) {
       console.log("Message arrived : " + msg + " from : " + source);
@@ -50,7 +50,7 @@ s.bind(protocol.PROTOCOL_PORT, function () {
 });
 
 s.on('message', function (msg, source) {
-   udpHandler(msg, source);
+   udpMessageHandler(msg, source);
 });
 
 //tcp
