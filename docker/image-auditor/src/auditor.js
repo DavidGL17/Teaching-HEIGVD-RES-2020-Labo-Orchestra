@@ -2,45 +2,36 @@
 const protocol = require('./protocol');
 
 const dgram = require('dgram');
-
 const s = dgram.createSocket('udp4');
 
 var musicians = new Map();
+const soundToInstrument = new Map();
+soundToInstrument.set("ti-ta-ti", "piano");
+soundToInstrument.set("pouet", "trumpet");
+soundToInstrument.set("trulu", "flute");
+soundToInstrument.set("gzi-gzi", "violin");
+soundToInstrument.set("boum-boum", "drum");
 
-var express = require('express');
-var app = express();
+const net = require('net');
+const server = new net.Server();
 
-//get instrument from sound
-function getInstrumentFromSound(sound) {
-   if (sound == protocol.piano.value) {
-      return "piano";
-   } else if (sound == protocol.drum.value) {
-      return "drum";
-   } else if (sound == protocol.flute.value) {
-      return "flute";
-   } else if (sound == protocol.trumpet.value) {
-      return "trumpet";
-   } else if (sound == protocol.violin.value) {
-      return "violin";
-   } else {
-      return null;
-   }
-}
+const moment = require('moment');
 
 //function to add a musician
 function udpHandler(msg, source) {
-   var instrument = getInstrumentFromSound(msg.sound);
+   jsonData = JSON.parse(msg);
+   var instrument = soundToInstrument.get(jsonData.sound);
    if (instrument == null) {
       console.log("Error, sound is not correct");
       return;
    }
    console.log("Message arrived : " + msg + " from : " + source);
-   var musician = musicians.get(msg.uuid);
+   var musician = musicians.get(jsonData.uuid);
    if (!musician) {
-      musicians.set(msg.uuid, { lastContact: new Date(), instrument: instrument, activeSince: new Date() });
+      musicians.set(jsonData.uuid, { lastContact: moment(), instrument: instrument, activeSince: moment() });
    } else {
-      musician.lastContact = new Date();
-      musicians.set(msg.uuid, musician);
+      musician.lastContact = moment();
+      musicians.set(jsonData.uuid, musician);
    }
 }
 
@@ -48,7 +39,7 @@ function udpHandler(msg, source) {
 function getMusicians() {
    var list = [];
    musicians.forEach(function (value, key) {
-      list.push({ uuid: key, instrument: value.instrument, activeSince: value.activeSince });
+      list.push({ uuid: key, instrument: value.instrument, activeSince: value.activeSince.utcOffset(+120).format() });
    });
    return list;
 }
@@ -64,22 +55,29 @@ s.on('message', function (msg, source) {
 });
 
 //tcp
-app.get('/', function (req, res) {
-   res.send(JSON.stringify(getMusicians()));
+server.listen(2205, function () {
+   console.log("Server listening for TCP connection requests on port 2205");
 });
 
-app.listen(2205, function () {
-   console.log('Accepting HTTP requests on port 3000.');
+server.on('connection', function (socket) {
+   console.log('A new TCP connection has been established.');
+
+   /* generate json content for TCP client */
+   var musicianAlive = getMusicians();
+   socket.write(JSON.stringify(musicianAlive));
+
+   /* We destroy the socket, that close the connection for the client */
+   socket.destroy();
 });
 
 //refresh map
 
 setInterval(function () {
-   var now = new Date();
-   musicians.forEach(function (value, key) {
-      var dif = Math.abs((now.getTime() - value.lastContact.getTime()) / 1000);
-      if (dif > 5) { //If last contact older than 5 sec
-         musicians.delete(key);
+   var now = moment();
+   musicians.forEach(function (value, key, map) {
+      if (now.subtract(5, 'seconds') > value.lastContact) { //If last contact older than 5 sec
+         map.delete(key);
+         console.log("Deleted musician " + key + " for inactivity");
       }
    });
-}, 1000);
+}, 500);
