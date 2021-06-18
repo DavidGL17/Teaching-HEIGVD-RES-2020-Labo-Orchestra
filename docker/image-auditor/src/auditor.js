@@ -20,18 +20,17 @@ const moment = require('moment');
 //function to add a musician
 function udpHandler(msg, source) {
    jsonData = JSON.parse(msg);
-   var instrument = soundToInstrument.get(jsonData.sound);
-   if (instrument == null) {
-      console.log("Error, sound is not correct");
-      return;
-   }
-   console.log("Message arrived : " + msg + " from : " + source);
-   var musician = musicians.get(jsonData.uuid);
-   if (!musician) {
-      musicians.set(jsonData.uuid, { lastContact: moment(), instrument: instrument, activeSince: moment() });
+   if (soundToInstrument.has(jsonData.sound) && jsonData.uuid) {
+      console.log("Message arrived : " + msg + " from : " + source);
+      if (!musicians.has(jsonData.uuid)) {
+         musicians.set(jsonData.uuid, { lastContact: moment(), instrument: soundToInstrument.get(jsonData.sound), activeSince: moment() });
+      } else {
+         var musician = musicians.get(jsonData.uuid);
+         musician.lastContact = moment();
+         musicians.set(jsonData.uuid, musician);
+      }
    } else {
-      musician.lastContact = moment();
-      musicians.set(jsonData.uuid, musician);
+      console.log("Received invalid data");
    }
 }
 
@@ -73,8 +72,8 @@ server.on('connection', function (socket) {
 //refresh map
 
 setInterval(function () {
-   var now = moment();
    musicians.forEach(function (value, key, map) {
+      var now = moment();
       if (now.subtract(5, 'seconds') > value.lastContact) { //If last contact older than 5 sec
          map.delete(key);
          console.log("Deleted musician " + key + " for inactivity");
